@@ -76,7 +76,9 @@ void loop()
 ```
 
 # Setup
-<iframe width="560" height="315" src="https://www.youtube.com/embed/b8254--ibmM?start=150" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![Intro Tutorial]          
+(https://img.youtube.com/vi/b8254--ibmM/hqdefault.jpg)] 
+(https://youtu.be/b8254--ibmM?t=150 "Intro Tutorial")
 
 Summary from video:
 
