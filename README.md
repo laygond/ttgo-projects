@@ -76,7 +76,7 @@ void loop()
 ```
 
 # Setup
-[![Intro Tutorial] (https://img.youtube.com/vi/b8254--ibmM/hqdefault.jpg)] (https://youtu.be/b8254--ibmM?t=150)
+[![Intro Tutorial](https://img.youtube.com/vi/b8254--ibmM/0.jpg)](https://youtu.be/b8254--ibmM?t=150 "Click to watch in YouTube")
 
 Summary from video:
 
