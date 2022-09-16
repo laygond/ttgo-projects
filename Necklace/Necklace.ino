@@ -1,68 +1,195 @@
-/*  
- Test the tft.print() viz embedded tft.write() function
-
- This sketch used font 2, 4, 7
- 
- Make sure all the display driver and pin connections are correct by
- editing the User_Setup.h file in the TFT_eSPI library folder.
-
- Note that yield() or delay(0) must be called in long duration for/while
- loops to stop the ESP8266 watchdog triggering.
-
- #########################################################################
- ###### DON'T FORGET TO UPDATE THE User_Setup.h FILE IN THE LIBRARY ######
- #########################################################################
- */
+// Display multiple GIFs with a press of a button (Carousel style)
+// by Laygond (laygond.com)
+//
+// DESCRIPTION: Carousel method for displaying GIFs. Pressing right or left
+// button switches to next or previous GIF. If you press both buttons it shows
+// battery level and then goes into deep sleep until either button is pressed
+// again.
+//  
+// NOTE:
+// - There are more animations to choose from under `animations_h`
+// - The AnimatedGIF class doesn't allocate or free any memory, but the
+// instance data occupies about 22.5K of RAM. 
 
 
-#include <TFT_eSPI.h> // Graphics and font library for ST7735 driver chip
+#include <AnimatedGIF.h>
 #include <SPI.h>
+#include <TFT_eSPI.h>
 
-TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
+//Board Pins
+#define RIGHT_BUTTON_PIN 35
+#define LEFT_BUTTON_PIN 0
 
-#define TFT_GREY 0x5AEB // New colour
+//USER CUSTOM PARAMETERS
+#include "animations_h/bolt.h"                                 
+#include "animations_h/asta.h"
+#include "animations_h/eye.h"
+#include "animations_h/tunnel.h"
+#include "animations_h/sun.h"
 
-void setup(void) {
-  tft.init();
-  tft.setRotation(1);
+#define GIF_IMAGE_0   bolt                             
+#define GIF_IMAGE_1   asta                            
+#define GIF_IMAGE_2   eye         
+#define GIF_IMAGE_3   tunnel     
+#define GIF_IMAGE_4   sun                        
+int total_gif = 5;
+
+//Code variables
+int button_option = 0; //changes when button is pressed
+int debounce_left = 0;
+int debounce_right= 0;
+AnimatedGIF gif;
+TFT_eSPI tft = TFT_eSPI();
+
+//Forward declarations
+void updateButtonOption();
+void showGIF(const uint8_t[]);
+
+
+void setup() 
+{
+  //Serial.begin(115200);
+  pinMode(RIGHT_BUTTON_PIN,INPUT_PULLUP); 
+  pinMode(LEFT_BUTTON_PIN,INPUT_PULLUP);  
+  tft.begin();
+  tft.setRotation(2);
+  tft.fillScreen(TFT_BLACK);
+  gif.begin(BIG_ENDIAN_PIXELS);
 }
 
-void loop() {
-  
-  // Fill screen with grey so we can see the effect of printing with and without 
-  // a background colour defined
-  tft.fillScreen(TFT_GREY);
-  
-  // Set "cursor" at top left corner of display (0,0) and select font 2
-  // (cursor will move to next line automatically during printing with 'tft.println'
-  //  or stay on the line is there is room for the text with tft.print)
-  tft.setCursor(0, 0, 2);
-  // Set the font colour to be white with a black background, set text size multiplier to 1
-  tft.setTextColor(TFT_WHITE,TFT_BLACK);  tft.setTextSize(1);
-  // We can now plot text on screen using the "print" class
-  tft.println("Hello World!");
-  
-  // Set the font colour to be yellow with no background, set to font 7
-  tft.setTextColor(TFT_YELLOW); tft.setTextFont(2);
-  tft.println(1234.56);
-  
-  // Set the font colour to be red with black background, set to font 4
-  tft.setTextColor(TFT_RED,TFT_BLACK);    tft.setTextFont(4);
-  //tft.println((long)3735928559, HEX); // Should print DEADBEEF
-  tft.println("DOMENICA");
+void loop()
+{ 
+  //Check Button is pressed
+  updateButtonOption();
 
-  // Set the font colour to be green with black background, set to font 2
-  tft.setTextColor(TFT_GREEN,TFT_BLACK);
-  tft.setTextFont(2);
-  tft.println("Groop");
+  //Choose Media based on button option
+  if (button_option == 0){
+    if (gif.open((uint8_t *)GIF_IMAGE_0, sizeof(GIF_IMAGE_0), GIFDraw))
+    {
+      tft.startWrite(); // The TFT chip slect is locked low
+      while (gif.playFrame(true, NULL))
+      {
+        yield();
+      }
+      gif.close();
+      tft.endWrite(); // Release TFT chip select for other SPI devices
+    }
+  }//end option
+  if (button_option == 1)
+  {
+    if (gif.open((uint8_t *)GIF_IMAGE_1, sizeof(GIF_IMAGE_1), GIFDraw))
+    {
+      tft.startWrite(); // The TFT chip slect is locked low
+      while (gif.playFrame(true, NULL))
+      {
+        yield();
+      }
+      gif.close();
+      tft.endWrite(); // Release TFT chip select for other SPI devices
+    }
+  }//end option
+  if (button_option == 2)
+  {
+    if (gif.open((uint8_t *)GIF_IMAGE_2, sizeof(GIF_IMAGE_2), GIFDraw))
+    {
+      tft.startWrite(); // The TFT chip slect is locked low
+      while (gif.playFrame(true, NULL))
+      {
+        yield();
+      }
+      gif.close();
+      tft.endWrite(); // Release TFT chip select for other SPI devices
+    }
+  }//end option
+  if (button_option == 3)
+  {
+    if (gif.open((uint8_t *)GIF_IMAGE_3, sizeof(GIF_IMAGE_3), GIFDraw))
+    {
+      tft.startWrite(); // The TFT chip slect is locked low
+      while (gif.playFrame(true, NULL))
+      {
+        yield();
+      }
+      gif.close();
+      tft.endWrite(); // Release TFT chip select for other SPI devices
+    }
+  }//end option
+  if (button_option == 4)
+  {
+    if (gif.open((uint8_t *)GIF_IMAGE_4, sizeof(GIF_IMAGE_4), GIFDraw))
+    {
+      tft.startWrite(); // The TFT chip slect is locked low
+      while (gif.playFrame(true, NULL))
+      {
+        yield();
+      }
+      gif.close();
+      tft.endWrite(); // Release TFT chip select for other SPI devices
+    }
+  }//end option
+}//end loop
 
-  // Test some print formatting functions
-  float fnumber = 123.45;
-   // Set the font colour to be blue with no background, set to font 2
-  tft.setTextColor(TFT_BLUE);    tft.setTextFont(2);
-  tft.print("Float = "); tft.println(fnumber);           // Print floating point number
-  tft.print("Binary = "); tft.println((int)fnumber, BIN); // Print as integer value in binary
-  tft.print("Hexadecimal = "); tft.println((int)fnumber, HEX); // Print as integer number in Hexadecimal
 
-  while(1) yield(); // We must yield() to stop a watchdog timeout.
+ /**
+ * Increases or decreases button_option by pressing left or right board buttons 
+ */
+void updateButtonOption()
+{
+  if(digitalRead(RIGHT_BUTTON_PIN)==0 )
+  {
+    if(debounce_right==0)
+    {
+        debounce_right=1;
+        tft.fillScreen(TFT_BLACK);
+        button_option++;
+        if (button_option >= total_gif){
+            button_option = 0;
+        }
+    }
+  }
+  else debounce_right=0;
+
+  if(digitalRead(LEFT_BUTTON_PIN)==0 )
+  {
+    if(debounce_left==0){
+        debounce_left=1;
+        tft.fillScreen(TFT_BLACK);
+        button_option--;
+        if (button_option < 0){
+            button_option = total_gif -1;
+        }
+    }
+  }
+  else debounce_left=0;
+   
 }
+
+ /**
+ * Helper Function to show gifs in one command (UNDER CONSTRUCTION) 
+ */
+//void showGIF(const uint8_t [] gify)
+//{
+//  if (gif.open((uint8_t *) gify, sizeof(gify), GIFDraw))
+//  {
+//    //tft.fillScreen(TFT_GREEN);
+//    tft.startWrite(); // The TFT chip slect is locked low
+//    while (gif.playFrame(true, NULL))
+//    {
+//      yield();
+//    }
+//    gif.close();
+//    tft.endWrite(); // Release TFT chip select for other SPI devices
+//  }
+//}
+
+// === PERSONAL NOTES IGNORE ====
+//// Check size of 2D array 
+//  Serial.println("Array: walk");
+//  Serial.println(sizeof(walk)/sizeof(walk[0]));
+//  Serial.println(sizeof(walk[0])/sizeof(walk[0][0]));
+
+//// Volos Method of Uploading GIFs (frame by frame style)
+//for(int i=0;i<frames;i++){
+//  delay(40);
+//  tft.pushImage(60, 15, animation_width, animation_height, walk[i]);}
+//}
