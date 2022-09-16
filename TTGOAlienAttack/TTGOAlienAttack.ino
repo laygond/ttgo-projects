@@ -53,7 +53,7 @@ int newLevelTime=15;
 void setup() {
   tft.init();
   tft.fillScreen(TFT_BLACK);
-  tft.setSwapBytes(true); 
+  tft.setSwapBytes(true); //to import custom byte headers (images,fonts,etc)
    
   ledcSetup(pwmLedChannelTFT, pwmFreq, pwmResolution);
   ledcAttachPin(TFT_BL, pwmLedChannelTFT);
